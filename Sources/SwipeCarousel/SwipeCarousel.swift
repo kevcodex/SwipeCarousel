@@ -21,6 +21,21 @@ public protocol SwipeCarouselDelegate: AnyObject {
     
     /// Called after the card has finished animating move
     func swipeCarouselDidCompleteMoving(_ swipeCarousel: SwipeCarousel, card: SwipeCarouselCardView)
+    
+    func swipeCarousel(_ swipeCarousel: SwipeCarousel, didSelectCardAt index: Int)
+}
+
+public extension SwipeCarouselDelegate {
+    func swipeCarouselWillBeginDragging(_ swipeCarousel: SwipeCarousel, card: SwipeCarouselCardView) {}
+    
+    func swipeCarouselIsDragging(_ swipeCarousel: SwipeCarousel, card: SwipeCarouselCardView, offset: CGFloat) {}
+    
+    func swipeCarouselDidEndDragging(_ swipeCarousel: SwipeCarousel, card: SwipeCarouselCardView) {}
+    
+    /// Called after the card has finished animating move
+    func swipeCarouselDidCompleteMoving(_ swipeCarousel: SwipeCarousel, card: SwipeCarouselCardView) {}
+    
+    func swipeCarousel(_ swipeCarousel: SwipeCarousel, didSelectCardAt index: Int) {}
 }
 
 // Apply offset transform and other transforms to mimic apple a little more
@@ -48,7 +63,7 @@ open class SwipeCarousel: UIView {
         }
     }
     
-    private(set) var cards = [SwipeCarouselCardContext]()
+    public private(set) var cards = [SwipeCarouselCardContext]()
     
     private(set) var currentIndex = 0
     
@@ -144,6 +159,9 @@ open class SwipeCarousel: UIView {
         gesture.addTarget(self, action: #selector(handle))
         gesture.delegate = self
         card.addGestureRecognizer(gesture)
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(didTap))
+        card.addGestureRecognizer(tapGesture)
     }
     
     @objc private func handle(panGesture: UIPanGestureRecognizer) {
@@ -261,6 +279,17 @@ open class SwipeCarousel: UIView {
         @unknown default:
             break
         }
+    }
+    
+    @objc private func didTap(_ gesture: UITapGestureRecognizer) {
+        
+        // Ensure the card tapped is the same as the current index
+        guard let card = cards.safe(index: currentIndex)?.card,
+              card == gesture.view else {
+            return
+        }
+        
+        delegate?.swipeCarousel(self, didSelectCardAt: currentIndex)
     }
     
     // From WWDC
