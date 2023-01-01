@@ -92,6 +92,7 @@ open class SwipeCarousel: UIView {
             let cardContext = cards.removeLast()
             cardContext.card.removeFromSuperview()
         }
+        currentIndex = 0
         
         let count = dataSource.numberOfItems(in: self)
         
