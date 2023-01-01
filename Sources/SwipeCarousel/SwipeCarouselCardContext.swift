@@ -11,4 +11,6 @@ public struct SwipeCarouselCardContext {
     public let card: SwipeCarouselCardView
     public let cardAnchor: NSLayoutConstraint
     public let cardWidthConstraint: NSLayoutConstraint
+    public let cardTop: NSLayoutConstraint
+    public let cardBottom: NSLayoutConstraint
 }

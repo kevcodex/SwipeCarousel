@@ -72,11 +72,9 @@ open class SwipeCarousel: UIView {
         super.layoutSubviews()
         
         // Slight hack to center cards in main view due to modified anchor point
-        for card in cards {
-            NSLayoutConstraint.activate([
-                card.card.topAnchor.constraint(equalTo: topAnchor, constant: frame.height / 2),
-                bottomAnchor.constraint(equalTo: card.card.bottomAnchor, constant: -frame.height / 2)
-            ])
+        for cardContext in cards {
+            cardContext.cardTop.constant = frame.height / 2
+            cardContext.cardBottom.constant = -frame.height / 2
         }
     }
     
@@ -116,10 +114,14 @@ open class SwipeCarousel: UIView {
             
             let cardAnchor = card.centerXAnchor.constraint(equalTo: centerXAnchor)
             let cardWidth = card.widthAnchor.constraint(equalToConstant: cardWidth)
+            let topAnchor = card.topAnchor.constraint(equalTo: topAnchor, constant: frame.height / 2)
+            let bottomAnchor = bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: -frame.height / 2)
             
             NSLayoutConstraint.activate([
                 cardAnchor,
-                cardWidth
+                cardWidth,
+                topAnchor,
+                bottomAnchor
             ])
             
             // Set out of max count to really small so it animates
@@ -129,7 +131,9 @@ open class SwipeCarousel: UIView {
             
             let context = SwipeCarouselCardContext(card: card,
                                                    cardAnchor: cardAnchor,
-                                                   cardWidthConstraint: cardWidth)
+                                                   cardWidthConstraint: cardWidth,
+                                                   cardTop: topAnchor,
+                                                   cardBottom: bottomAnchor)
             cards.append(context)
         }
     }
