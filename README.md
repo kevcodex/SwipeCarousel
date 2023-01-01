@@ -1,3 +1,5 @@
 # SwipeCarousel
 
-A description of this package.
+View that mimics the photo swiping on iMessage
+
+WIP
