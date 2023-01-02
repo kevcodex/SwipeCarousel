@@ -1,5 +1,5 @@
 //
-//  SwipeCarousel.swift
+//  DeckView.swift
 //  RKC
 //
 //  Created by Kevin Chen on 12/28/22.
@@ -7,50 +7,50 @@
 
 import UIKit
 
-public protocol SwipeCarouselDatasource: AnyObject {
-    func numberOfItems(in swipeCarousel: SwipeCarousel) -> Int
-    func swipeCarousel(_ swipeCarousel: SwipeCarousel, cellForItemAt index: Int) -> SwipeCarouselCardView
+public protocol DeckViewDatasource: AnyObject {
+    func numberOfItems(in deckView: DeckView) -> Int
+    func deckView(_ deckView: DeckView, cellForItemAt index: Int) -> DeckViewCardView
 }
 
-public protocol SwipeCarouselDelegate: AnyObject {
-    func swipeCarouselWillBeginDragging(_ swipeCarousel: SwipeCarousel, card: SwipeCarouselCardView)
+public protocol DeckViewDelegate: AnyObject {
+    func deckViewWillBeginDragging(_ deckView: DeckView, card: DeckViewCardView)
     
-    func swipeCarouselIsDragging(_ swipeCarousel: SwipeCarousel, card: SwipeCarouselCardView, offset: CGFloat)
+    func deckViewIsDragging(_ deckView: DeckView, card: DeckViewCardView, offset: CGFloat)
     
-    func swipeCarouselDidEndDragging(_ swipeCarousel: SwipeCarousel, card: SwipeCarouselCardView)
+    func deckViewDidEndDragging(_ deckView: DeckView, card: DeckViewCardView)
     
     /// Called after the card has finished animating move
-    func swipeCarouselDidCompleteMoving(_ swipeCarousel: SwipeCarousel, card: SwipeCarouselCardView)
+    func deckViewDidCompleteMoving(_ deckView: DeckView, card: DeckViewCardView)
     
-    func swipeCarousel(_ swipeCarousel: SwipeCarousel, didSelectCardAt index: Int)
+    func deckView(_ deckView: DeckView, didSelectCardAt index: Int)
 }
 
-public extension SwipeCarouselDelegate {
-    func swipeCarouselWillBeginDragging(_ swipeCarousel: SwipeCarousel, card: SwipeCarouselCardView) {}
+public extension DeckViewDelegate {
+    func deckViewWillBeginDragging(_ deckView: DeckView, card: DeckViewCardView) {}
     
-    func swipeCarouselIsDragging(_ swipeCarousel: SwipeCarousel, card: SwipeCarouselCardView, offset: CGFloat) {}
+    func deckViewIsDragging(_ deckView: DeckView, card: DeckViewCardView, offset: CGFloat) {}
     
-    func swipeCarouselDidEndDragging(_ swipeCarousel: SwipeCarousel, card: SwipeCarouselCardView) {}
+    func deckViewDidEndDragging(_ deckView: DeckView, card: DeckViewCardView) {}
     
     /// Called after the card has finished animating move
-    func swipeCarouselDidCompleteMoving(_ swipeCarousel: SwipeCarousel, card: SwipeCarouselCardView) {}
+    func deckViewDidCompleteMoving(_ deckView: DeckView, card: DeckViewCardView) {}
     
-    func swipeCarousel(_ swipeCarousel: SwipeCarousel, didSelectCardAt index: Int) {}
+    func deckView(_ deckView: DeckView, didSelectCardAt index: Int) {}
 }
 
 // Apply offset transform and other transforms to mimic apple a little more
 // Handle reuse of many stacks of items
 
 /// A view similar to swiping photos on imessage
-open class SwipeCarousel: UIView {
+open class DeckView: UIView {
     
-    public weak var dataSource: SwipeCarouselDatasource? {
+    public weak var dataSource: DeckViewDatasource? {
         didSet {
             refresh()
         }
     }
     
-    public weak var delegate: SwipeCarouselDelegate?
+    public weak var delegate: DeckViewDelegate?
     
     /// The maximum number of cards in stack on left and right sides (includes center)
     public var maxStack = 5
@@ -63,7 +63,7 @@ open class SwipeCarousel: UIView {
         }
     }
     
-    public private(set) var cards = [SwipeCarouselCardContext]()
+    public private(set) var cards = [DeckViewCardContext]()
     
     private(set) var currentIndex = 0
     
@@ -112,7 +112,7 @@ open class SwipeCarousel: UIView {
         let count = dataSource.numberOfItems(in: self)
         
         for i in 0..<count {
-            let card = dataSource.swipeCarousel(self, cellForItemAt: i)
+            let card = dataSource.deckView(self, cellForItemAt: i)
             card.translatesAutoresizingMaskIntoConstraints = false
             
             setupGesture(to: card)
@@ -145,7 +145,7 @@ open class SwipeCarousel: UIView {
                 applyTransforms(to: card, multiplier: scaleDenominator)
             }
             
-            let context = SwipeCarouselCardContext(card: card,
+            let context = DeckViewCardContext(card: card,
                                                    cardAnchor: cardAnchor,
                                                    cardWidthConstraint: cardWidth,
                                                    cardTop: topAnchor,
@@ -154,7 +154,7 @@ open class SwipeCarousel: UIView {
         }
     }
     
-    private func setupGesture(to card: SwipeCarouselCardView) {
+    private func setupGesture(to card: DeckViewCardView) {
         let gesture = UIPanGestureRecognizer()
         gesture.addTarget(self, action: #selector(handle))
         gesture.delegate = self
@@ -187,7 +187,7 @@ open class SwipeCarousel: UIView {
         switch panGesture.state {
             
         case .began:
-            delegate?.swipeCarouselWillBeginDragging(self, card: cardContext.card)
+            delegate?.deckViewWillBeginDragging(self, card: cardContext.card)
         case .changed:
                                     
             // If exceeds max bounds then have card come closer and flip subview
@@ -236,7 +236,7 @@ open class SwipeCarousel: UIView {
             let distanceIncrement = dx / (maxDistance * 2)
             animateAllCards(adding: distanceIncrement)
             
-            delegate?.swipeCarouselIsDragging(self, card: cardContext.card, offset: currentX)
+            delegate?.deckViewIsDragging(self, card: cardContext.card, offset: currentX)
 
         case .ended, .cancelled, .failed:
             
@@ -264,14 +264,14 @@ open class SwipeCarousel: UIView {
 
             let vector = CGVector(dx: velocity.x / projectedDX, dy: 0)
             
-            delegate?.swipeCarouselDidEndDragging(self, card: cardContext.card)
+            delegate?.deckViewDidEndDragging(self, card: cardContext.card)
             
             animateMovingCard(for: cardContext, with: vector, frequencyPeriod: 0.38) { [weak self] in
                 guard let self = self else {
                     return
                 }
                 
-                self.delegate?.swipeCarouselDidCompleteMoving(self, card: cardContext.card)
+                self.delegate?.deckViewDidCompleteMoving(self, card: cardContext.card)
             }
             
         case .possible:
@@ -289,7 +289,7 @@ open class SwipeCarousel: UIView {
             return
         }
         
-        delegate?.swipeCarousel(self, didSelectCardAt: currentIndex)
+        delegate?.deckView(self, didSelectCardAt: currentIndex)
     }
     
     // From WWDC
@@ -315,7 +315,7 @@ open class SwipeCarousel: UIView {
         }
     }
     
-    private func animateMovingCard(for cardContext: SwipeCarouselCardContext, with initialVelocity: CGVector, frequencyPeriod: CGFloat, completion: (() -> Void)? = nil) {
+    private func animateMovingCard(for cardContext: DeckViewCardContext, with initialVelocity: CGVector, frequencyPeriod: CGFloat, completion: (() -> Void)? = nil) {
         
         let timing = UISpringTimingParameters(dampingRatio: 1.0,
                                               frequencyPeriod: frequencyPeriod,
@@ -343,7 +343,7 @@ open class SwipeCarousel: UIView {
         animator.startAnimation()
     }
     
-    private func applyTransforms(to card: SwipeCarouselCardView, multiplier: CGFloat) {
+    private func applyTransforms(to card: DeckViewCardView, multiplier: CGFloat) {
         let degrees = (multiplier) * degreesMultiplier
         let rotate = CGAffineTransform(rotationAngle: (degrees * CGFloat.pi / 180))
         
@@ -360,7 +360,7 @@ open class SwipeCarousel: UIView {
 
 // MARK: - Gesture Recognizer Delegate
 
-extension SwipeCarousel: UIGestureRecognizerDelegate {
+extension DeckView: UIGestureRecognizerDelegate {
     
     public override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         guard let gesture = gestureRecognizer as? UIPanGestureRecognizer else {

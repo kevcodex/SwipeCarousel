@@ -1,4 +1,4 @@
-# SwipeCarousel
+# DeckView
 
 View that mimics the photo swiping on iMessage
 

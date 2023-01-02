@@ -4,23 +4,23 @@
 import PackageDescription
 
 let package = Package(
-    name: "SwipeCarousel",
+    name: "DeckView",
     platforms: [
         .iOS(.v16)
     ],
     products: [
         .library(
-            name: "SwipeCarousel",
-            targets: ["SwipeCarousel"]),
+            name: "DeckView",
+            targets: ["DeckView"]),
     ],
     dependencies: [
     ],
     targets: [
         .target(
-            name: "SwipeCarousel",
+            name: "DeckView",
             dependencies: []),
         .testTarget(
-            name: "SwipeCarouselTests",
-            dependencies: ["SwipeCarousel"]),
+            name: "DeckViewTests",
+            dependencies: ["DeckView"]),
     ]
 )

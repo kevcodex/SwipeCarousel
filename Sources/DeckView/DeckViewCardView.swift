@@ -1,5 +1,5 @@
 //
-//  SwipeCarouselCardView.swift
+//  DeckViewCardView.swift
 //  RKC
 //
 //  Created by Kevin Chen on 1/1/23.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-open class SwipeCarouselCardView: UIView {
+open class DeckViewCardView: UIView {
     public let contentView = UIView()
 
     public override init(frame: CGRect) {
