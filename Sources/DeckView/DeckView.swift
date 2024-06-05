@@ -67,9 +67,9 @@ open class DeckView: UIView {
     
     private(set) var currentIndex = 0
     
-    public let scaleDenominator: CGFloat = 20
-    public let degreesMultiplier: CGFloat = 4
-    public let minScaleAmount: CGFloat = 0.75
+    public var scaleDenominator: CGFloat = 20
+    public var degreesMultiplier: CGFloat = 4
+    public var minScaleAmount: CGFloat = 0.75
     /// The distance the card is allowed to travel when panning
     public var maxDistance: CGFloat = 120
     
