@@ -67,9 +67,14 @@ open class DeckView: UIView {
     
     private(set) var currentIndex = 0
     
+    // All things related to how the cards behind will look
     public var scaleDenominator: CGFloat = 20
     public var degreesMultiplier: CGFloat = 4
+    public var translationXDistance: CGFloat = 20.0
+    public var translationYDistance: CGFloat = 5.0
+    
     public var minScaleAmount: CGFloat = 0.75
+
     /// The distance the card is allowed to travel when panning
     public var maxDistance: CGFloat = 120
     
@@ -346,12 +351,16 @@ open class DeckView: UIView {
     private func applyTransforms(to card: DeckViewCardView, multiplier: CGFloat) {
         let degrees = (multiplier) * degreesMultiplier
         let rotate = CGAffineTransform(rotationAngle: (degrees * CGFloat.pi / 180))
-        
-        card.transform = rotate
-        
+                
         // Last needs to be smallets and most rotatest
         let scaleMultiplier = 1 - (CGFloat(abs(multiplier)) / scaleDenominator)
         let scale = CGAffineTransform(scaleX: 1 * scaleMultiplier, y: 1 * scaleMultiplier)
+        
+        let translate = CGAffineTransform(translationX: multiplier * translationXDistance, y: -abs(multiplier) * translationYDistance)
+        
+        // Combine the transformations: first scale, then rotate, then translate
+        let combinedTransform = scale.concatenating(rotate).concatenating(translate)
+        card.transform = combinedTransform
         
         // This is to keep the scale anchor in center but the rotation anchor at bottom
         card.contentView.transform = scale
